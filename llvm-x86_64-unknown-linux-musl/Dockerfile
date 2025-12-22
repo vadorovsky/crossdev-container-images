@@ -16,5 +16,5 @@ RUN emerge-webrsync \
 COPY make.conf /usr/aarch64-unknown-linux-musl/etc/portage/make.conf
 COPY gentoobinhost.conf /usr/aarch64-unknown-linux-musl/etc/portage/binrepos.conf/gentoobinhost.conf
 RUN PORTAGE_CONFIGROOT=/usr/x86_64-unknown-linux-musl eselect profile set default/linux/amd64/23.0/musl/llvm \
-    && aarch64-unknown-linux-musl-emerge --getbinpkg --binpkg-changed-deps=n llvm-runtimes/clang-runtime \
-    && aarch64-unknown-linux-musl-emerge --getbinpkg --binpkg-changed-deps=n @system
+    && x86_64-unknown-linux-musl-emerge --getbinpkg --binpkg-changed-deps=n llvm-runtimes/clang-runtime \
+    && x86_64-unknown-linux-musl-emerge --getbinpkg --binpkg-changed-deps=n @system
