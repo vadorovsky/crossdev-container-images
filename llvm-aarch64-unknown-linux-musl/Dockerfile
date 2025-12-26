@@ -17,5 +17,16 @@ RUN emerge-webrsync \
 COPY make.conf /usr/aarch64-unknown-linux-musl/etc/portage/make.conf
 COPY gentoobinhost.conf /usr/aarch64-unknown-linux-musl/etc/portage/binrepos.conf/gentoobinhost.conf
 RUN PORTAGE_CONFIGROOT=/usr/aarch64-unknown-linux-musl eselect profile set default/linux/arm64/23.0/split-usr/musl/llvm \
-    && aarch64-unknown-linux-musl-emerge --getbinpkg --binpkg-changed-deps=n llvm-runtimes/clang-runtime \
-    && aarch64-unknown-linux-musl-emerge --getbinpkg --binpkg-changed-deps=n @system
+    # Install LLVM runtime first, building any sofware won't work without it.
+    # Use individual packages instead of llvm-runtimes/clang-runtime, since we
+    # are not inserested in installing clang inside sysroot.
+    && aarch64-unknown-linux-musl-emerge --getbinpkg --binpkg-changed-deps=n \
+        llvm-runtimes/compiler-rt \
+        llvm-runtimes/libcxx \
+        llvm-runtimes/libcxxabi \
+        llvm-runtimes/libunwind \
+    && aarch64-unknown-linux-musl-emerge --getbinpkg --binpkg-changed-deps=n \
+        app-arch/zstd \
+        dev-libs/libxml2 \
+        sys-libs/zlib-ng \
+        virtual/zlib
