@@ -26,6 +26,7 @@ jobs:
           #   tag-prefix: arm64
         target:
           - llvm-aarch64-unknown-linux-musl
+          - llvm-riscv64-unknown-linux-musl
           - llvm-x86_64-unknown-linux-musl
     permissions:
       contents: read
@@ -64,6 +65,7 @@ jobs:
       matrix:
         target:
           - llvm-aarch64-unknown-linux-musl
+          - llvm-riscv64-unknown-linux-musl
           - llvm-x86_64-unknown-linux-musl
     permissions:
       contents: read
