@@ -20,10 +20,9 @@ jobs:
           - runner: ubuntu-latest
             platform: linux/amd64
             tag-prefix: amd64
-          # FIXME: Gets stuck on the GitHub runners, reason yet unknown.
-          # - runner: ubuntu-24.04-arm
-          #   platform: linux/arm64
-          #   tag-prefix: arm64
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+            tag-prefix: arm64
         target:
           - llvm-aarch64-unknown-linux-musl
           - llvm-riscv64-unknown-linux-musl
