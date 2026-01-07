@@ -30,3 +30,6 @@ RUN PORTAGE_CONFIGROOT=/usr/${CROSSDEV_TARGET} \
         app-arch/zstd \
         sys-libs/zlib \
         virtual/zlib
+
+# Use bash login shell so /etc/profile is sourced before running CMD/args.
+CMD ["/bin/bash", "-l"]
