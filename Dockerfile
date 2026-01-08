@@ -7,6 +7,8 @@ ARG CROSSDEV_TARGET
 ARG CROSSDEV_PROFILE
 ARG CROSSDEV_EXTRA_ARGS
 
+COPY ${CROSSDEV_TOOLCHAIN}-${CROSSDEV_TARGET}/env /
+COPY ${TARGETARCH}/${CROSSDEV_TARGET}/entrypoint.sh /
 RUN mkdir -p /var/db/repos/gentoo \
     && wget -qO - \
         https://github.com/gentoo/gentoo/archive/${GENTOO_COMMIT}.tar.gz | \
@@ -31,5 +33,4 @@ RUN PORTAGE_CONFIGROOT=/usr/${CROSSDEV_TARGET} \
         sys-libs/zlib \
         virtual/zlib
 
-# Use bash login shell so /etc/profile is sourced before running CMD/args.
-CMD ["/bin/bash", "-l"]
+ENTRYPOINT ["/entrypoint.sh"]
