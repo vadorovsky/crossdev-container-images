@@ -1,0 +1,2 @@
+CC=aarch64-unknown-linux-musl-clang
+CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-unknown-linux-musl-clang

@@ -1,0 +1,2 @@
+CC=riscv64-unknown-linux-musl-clang
+CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER=riscv64-unknown-linux-musl-clang
