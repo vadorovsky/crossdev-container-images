@@ -1,0 +1,6 @@
+app-arch/zstd static-libs
+dev-libs/glib static-libs
+dev-libs/libpcre2 static-libs
+sys-apps/attr static-libs
+sys-libs/zlib static-libs
+virtual/zlib static-libs

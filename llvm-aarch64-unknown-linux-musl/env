@@ -1,2 +1,2 @@
-CC=aarch64-unknown-linux-musl-clang
-CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-unknown-linux-musl-clang
+export CC_aarch64_unknown_linux_musl=aarch64-unknown-linux-musl-clang
+export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-unknown-linux-musl-clang

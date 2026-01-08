@@ -23,10 +23,12 @@ jobs:
           - runner: ubuntu-24.04-arm
             platform: linux/arm64
             tag-prefix: arm64
+        toolchain:
+          - llvm
         target:
-          - llvm-aarch64-unknown-linux-musl
-          - llvm-riscv64-unknown-linux-musl
-          - llvm-x86_64-unknown-linux-musl
+          - aarch64-unknown-linux-musl
+          - riscv64-unknown-linux-musl
+          - x86_64-unknown-linux-musl
     permissions:
       contents: read
       packages: write
@@ -38,21 +40,22 @@ jobs:
         with:
           containerfiles: Dockerfile
           image: ${{ env.IMAGE }}
-          tags: ${{ format('{0}-{1}', matrix.host.tag-prefix, matrix.target) }}
+          tags: ${{ format('{0}-{1}-{2}', matrix.host.tag-prefix, matrix.toolchain, matrix.target) }}
           platforms: ${{ matrix.host.platform }}
           extra-args: |
-            --build-arg-file ${{ matrix.target }}/build-args.conf
+            --build-arg-file ${{ matrix.host.tag-prefix }}/${{ matrix.target }}/build-args.conf
+            --build-arg-file ${{ matrix.toolchain }}-${{ matrix.target }}/build-args.conf
 
       - name: Create image archive
         run: |
           buildah push \
-            "${{ env.IMAGE }}:${{ matrix.host.tag-prefix }}-${{ matrix.target }}" \
-            "oci-archive:${{ matrix.host.tag-prefix }}-${{ matrix.target }}.tar"
+            "${{ env.IMAGE }}:${{ matrix.host.tag-prefix }}-${{ matrix.toolchain }}-${{ matrix.target }}" \
+            "oci-archive:${{ matrix.host.tag-prefix }}-${{ matrix.toolchain }}-${{ matrix.target }}.tar"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ format('{0}-{1}', matrix.host.tag-prefix, matrix.target) }}
-          path: ${{ format('{0}-{1}.tar', matrix.host.tag-prefix, matrix.target) }}
+          name: ${{ format('{0}-{1}-{2}', matrix.host.tag-prefix, matrix.toolchain, matrix.target) }}
+          path: ${{ format('{0}-{1}-{2}.tar', matrix.host.tag-prefix, matrix.toolchain, matrix.target) }}
           if-no-files-found: error
           retention-days: 1
 
@@ -62,10 +65,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        toolchain:
+          - llvm
         target:
-          - llvm-aarch64-unknown-linux-musl
-          - llvm-riscv64-unknown-linux-musl
-          - llvm-x86_64-unknown-linux-musl
+          - aarch64-unknown-linux-musl
+          - riscv64-unknown-linux-musl
+          - x86_64-unknown-linux-musl
     permissions:
       contents: read
       packages: write
@@ -79,23 +84,23 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          pattern: ${{ format('*-{0}', matrix.target) }}
+          pattern: ${{ format('*-{0}-{1}', matrix.toolchain, matrix.target) }}
           path: artifacts
           merge-multiple: true
 
       - name: Create multi-platform manifest
         run: |
           set -euxo pipefail
-          buildah manifest create "${{ env.IMAGE }}:${{ matrix.target }}"
+          buildah manifest create "${{ env.IMAGE }}:${{ matrix.toolchain }}-${{ matrix.target }}"
           shopt -s nullglob
           for archive in artifacts/*; do
             image_id=$(buildah pull "oci-archive:${archive}")
-            buildah manifest add "${{ env.IMAGE }}:${{ matrix.target }}" \
+            buildah manifest add "${{ env.IMAGE }}:${{ matrix.toolchain }}-${{ matrix.target }}" \
               "containers-storage:${image_id}"
           done
 
       - name: Push multi-platform manifest
         if: github.event_name == 'push'
         run: |
-          buildah manifest push --all "${{ env.IMAGE }}:${{ matrix.target }}" \
-            "docker://${{ env.IMAGE }}:${{ matrix.target }}"
+          buildah manifest push --all "${{ env.IMAGE }}:${{ matrix.toolchain }}-${{ matrix.target }}" \
+            "docker://${{ env.IMAGE }}:${{ matrix.toolchain }}-${{ matrix.target }}"

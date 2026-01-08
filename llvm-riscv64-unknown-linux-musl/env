@@ -1,2 +1,2 @@
-CC=riscv64-unknown-linux-musl-clang
-CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER=riscv64-unknown-linux-musl-clang
+export CC_riscv64_unknown_linux_musl=riscv64-unknown-linux-musl-clang
+export CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_MUSL_LINKER=riscv64-unknown-linux-musl-clang

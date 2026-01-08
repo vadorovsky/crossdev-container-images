@@ -6,9 +6,12 @@ ARG CROSSDEV_TOOLCHAIN
 ARG CROSSDEV_TARGET
 ARG CROSSDEV_PROFILE
 ARG CROSSDEV_EXTRA_ARGS
+ARG EXTRA_PACKAGES
 
 COPY ${CROSSDEV_TOOLCHAIN}-${CROSSDEV_TARGET}/env /
 COPY ${TARGETARCH}/${CROSSDEV_TARGET}/entrypoint.sh /
+COPY package.use/static /etc/portage/package.use/
+COPY ${TARGETARCH}/${CROSSDEV_TARGET}/package.use/qemu /etc/portage/package.use/
 RUN mkdir -p /var/db/repos/gentoo \
     && wget -qO - \
         https://github.com/gentoo/gentoo/archive/${GENTOO_COMMIT}.tar.gz | \
@@ -18,6 +21,7 @@ RUN mkdir -p /var/db/repos/gentoo \
         app-eselect/eselect-repository \
         dev-vcs/git \
         sys-devel/crossdev \
+        ${EXTRA_PACKAGES} \
     && eselect repository create crossdev \
     && crossdev ${CROSSDEV_EXTRA_ARGS} --show-fail-log \
         --target ${CROSSDEV_TARGET} \
