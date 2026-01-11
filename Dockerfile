@@ -12,6 +12,11 @@ COPY ${CROSSDEV_TOOLCHAIN}-${CROSSDEV_TARGET}/env /
 COPY ${TARGETARCH}/${CROSSDEV_TARGET}/entrypoint.sh /
 COPY package.use/static /etc/portage/package.use/
 COPY ${TARGETARCH}/${CROSSDEV_TARGET}/package.use/qemu /etc/portage/package.use/
+RUN mkdir -p /usr/${CROSSDEV_TARGET}/etc/portage/binrepos.conf
+COPY ${TARGETARCH}/${CROSSDEV_TARGET}/make.conf \
+        /usr/${CROSSDEV_TARGET}/etc/portage/
+COPY ${CROSSDEV_TOOLCHAIN}-${CROSSDEV_TARGET}/gentoobinhost.conf \
+        /usr/${CROSSDEV_TARGET}/etc/portage/binrepos.conf/
 RUN mkdir -p /var/db/repos/gentoo \
     && wget -qO - \
         https://github.com/gentoo/gentoo/archive/${GENTOO_COMMIT}.tar.gz | \
@@ -25,16 +30,23 @@ RUN mkdir -p /var/db/repos/gentoo \
     && eselect repository create crossdev \
     && crossdev ${CROSSDEV_EXTRA_ARGS} --show-fail-log \
         --target ${CROSSDEV_TARGET} \
-    && mkdir -p /usr/${CROSSDEV_TARGET}/etc/portage/binrepos.conf
-COPY ${TARGETARCH}/${CROSSDEV_TARGET}/make.conf \
-        /usr/${CROSSDEV_TARGET}/etc/portage/
-COPY ${CROSSDEV_TOOLCHAIN}-${CROSSDEV_TARGET}/gentoobinhost.conf \
-        /usr/${CROSSDEV_TARGET}/etc/portage/binrepos.conf/
-RUN PORTAGE_CONFIGROOT=/usr/${CROSSDEV_TARGET} \
-      eselect profile set ${CROSSDEV_PROFILE} \
+    && emerge --deselect \
+        app-eselect/eselect-repository \
+        dev-vcs/git \
+    && emerge --depclean \
+    && ln -snf \
+        /var/db/repos/gentoo/profiles/${CROSSDEV_PROFILE} \
+        /usr/${CROSSDEV_TARGET}/etc/portage/make.profile \
     && ${CROSSDEV_TARGET}-emerge --getbinpkg \
         app-arch/zstd \
         sys-libs/zlib \
-        virtual/zlib
+        virtual/zlib \
+    && rm -fr \
+        /var/cache/binpkgs/* \
+        /var/cache/distfiles/* \
+        /var/db/repos/* \
+        /var/log/emerge* \
+        /var/log/portage/* \
+        /var/tmp/portage/*
 
 ENTRYPOINT ["/entrypoint.sh"]
