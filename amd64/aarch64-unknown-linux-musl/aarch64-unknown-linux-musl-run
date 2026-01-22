@@ -1,0 +1,9 @@
+#!/bin/bash
+
+SYSROOT=/usr/aarch64-unknown-linux-musl
+LD_MUSL_ARCH=aarch64
+LIBPATH="$(aarch64-unknown-linux-musl-clang -print-search-dirs \
+	| sed -n 's/^libraries: =//p')"
+
+exec qemu-aarch64 -L "$SYSROOT" \
+	"${SYSROOT}/lib/ld-musl-${LD_MUSL_ARCH}.so.1" --library-path "$LIBPATH" "$@"

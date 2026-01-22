@@ -1,0 +1,2 @@
+# Gentoo upstream did not stabilize llvm-libgcc for non-x86_64.
+=llvm-runtimes/libgcc-21.1.8 **
